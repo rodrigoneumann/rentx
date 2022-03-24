@@ -1,4 +1,5 @@
 import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
 import AppLoading from 'expo-app-loading';
 import { ThemeProvider } from 'styled-components'
 
@@ -13,10 +14,10 @@ import {
   Archivo_600SemiBold
 } from '@expo-google-fonts/archivo'
 
-import { CarDetails } from './src/screens/CarDetails';
-import { ScheduleDetails } from './src/screens/ScheduleDetails';
+import { Routes } from './src/routes';
 
 import theme from './src/styles/theme';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 export default function App() {
   const [fontLoaded] = useFonts({
@@ -32,8 +33,12 @@ export default function App() {
   }
 
   return (
-    <ThemeProvider theme={theme}> 
-      <ScheduleDetails />
-    </ThemeProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <NavigationContainer>
+        <ThemeProvider theme={theme}> 
+          <Routes />
+        </ThemeProvider>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
 }

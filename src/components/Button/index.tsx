@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { useTheme } from 'styled-components';
+
 import {
   Container,
   Title
@@ -13,9 +15,8 @@ interface Props {
 
 export function Button({
     title,
-    color,
     ...rest
-}){
+}: Props){
   return (
     <Container {...rest}>
         <Title>{title}</Title>
