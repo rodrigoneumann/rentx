@@ -1,6 +1,7 @@
 import styled, { css } from 'styled-components/native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { getStatusBarHeight } from 'react-native-iphone-x-helper';
+import { Platform } from 'react-native';
 
 interface DateValueProps {
   selected: boolean;
@@ -53,7 +54,7 @@ export const DateTitle = styled.Text`
 export const DateValue = styled.Text<DateValueProps>`
   color: ${({ theme }) => theme.colors.shape};
   font-family: ${({ theme }) => theme.fonts.primary_500};
-  font-size: ${RFValue(15)}px;
+  font-size: ${Platform.OS === 'ios' ? RFValue(15) : RFValue(13)}px; 
 
   ${({ selected, theme }) => !selected && css`
     border-bottom-width: 1px;

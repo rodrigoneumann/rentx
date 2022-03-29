@@ -1,16 +1,12 @@
 import React from 'react';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import { ImgSlider } from '../../components/ImgSlider'
 import { BackButton } from '../../components/BackButton';
 import { Accessory } from '../../components/Accessory'
 import { Button } from '../../components/Button';
 
-import speedSvg from '../../assets/speed.svg'
-import accelerationSvg from '../../assets/acceleration.svg'
-import forceSvg from '../../assets/force.svg'
-import gasolineSvg from '../../assets/gasoline.svg'
-import exchangeSvg from '../../assets/exchange.svg'
-import peopleSvg from '../../assets/people.svg'
+import {getAccessoryIcon} from '../../utils/getAccessoryIcon'
+
 
 import {
   Container,
@@ -28,52 +24,66 @@ import {
   Accessories,
   Footer
 } from './styles';
+import { CarDTO } from '../../dtos/CarDTO';
 
 type Nav = {
-  navigate: (value: string) => void;
+  navigate: (value: string, {}) => void;
+  goBack: () => void;
+}
+
+interface Params {
+  car: CarDTO
 }
 
 export function CarDetails(){
   const navigation = useNavigation<Nav>();
+  const route = useRoute();
+  const { car } = route.params as Params;
 
   function handleConfirmRental(){
-    navigation.navigate('Schedule')
+    navigation.navigate('Schedule', { car })
   }
+
+  function handleBack() {
+    navigation.goBack()
+  }
+
   return (
     <Container>
       <Header>
-        <BackButton onPress={() => {}}/>
+        <BackButton onPress={handleBack}/>
       </Header>
       
       <CarImages>
         <ImgSlider 
-          imagesUrl={['https://esquilo.io/png/thumb/tOZhZK8Na6Txjt1-Audi-RS5-Red-PNG.png']}
+          imagesUrl={car.photos}
         />
       </CarImages>
 
       <Content>
         <Details>
           <Description>
-            <Brand>Audi</Brand>
-            <Name>R5</Name>
+            <Brand>{car.brand}</Brand>
+            <Name>{car.name}</Name>
           </Description>
           <Rent>
-            <Period>a day</Period>
-            <Price>£80</Price>
+            <Period>{car.rent.period}</Period>
+            <Price>£{car.rent.price}.00</Price>
           </Rent>
         </Details>
 
         <Accessories>
-          <Accessory name='380km/h' icon={speedSvg}/>
-          <Accessory name='3.2s' icon={accelerationSvg}/>
-          <Accessory name='800 HP' icon={forceSvg}/>
-          <Accessory name='Gasoline' icon={gasolineSvg}/>
-          <Accessory name='Auto' icon={exchangeSvg}/>
-          <Accessory name='4 people' icon={peopleSvg}/>
+          {
+            car.accessories.map(accessory => (
+              <Accessory 
+                key={accessory.type}
+                name={accessory.name} 
+                icon={getAccessoryIcon(accessory.type)}/>
+            ))
+          }
+          
         </Accessories>
-        <About>
-            This is a sport car. It emerged from the legendary bull fighting pardoned in the Plaza Real Maestranza de Sevilla. It is a beautiful car for those who like to accelerate.
-        </About>
+        <About>{car.about}</About>
       </Content>
 
       <Footer>

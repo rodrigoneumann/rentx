@@ -1,19 +1,17 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTheme } from 'styled-components';
 import { ImgSlider } from '../../components/ImgSlider'
 import { BackButton } from '../../components/BackButton';
 import { Accessory } from '../../components/Accessory'
 import { Button } from '../../components/Button';
+import { useNavigation, useRoute } from '@react-navigation/native';
+import { CarDTO } from '../../dtos/CarDTO';
+import { format } from 'date-fns';
 
 import { Feather } from '@expo/vector-icons'
 import { RFValue } from 'react-native-responsive-fontsize';
 
-import speedSvg from '../../assets/speed.svg'
-import accelerationSvg from '../../assets/acceleration.svg'
-import forceSvg from '../../assets/force.svg'
-import gasolineSvg from '../../assets/gasoline.svg'
-import exchangeSvg from '../../assets/exchange.svg'
-import peopleSvg from '../../assets/people.svg'
+import { getAccessoryIcon } from '../../utils/getAccessoryIcon'
 
 import {
   Container,
@@ -40,51 +38,79 @@ import {
   RentalPriceQuota,
   RentalPriceTotal
 } from './styles';
-import { useNavigation } from '@react-navigation/native';
 
 type Nav = {
   navigate: (value: string) => void;
+  goBack: () => void;
+}
+
+interface Params {
+  car: CarDTO;
+  dates: string[];
+}
+
+interface RentalPeriod {
+  start: string;
+  end: string;
 }
 
 export function ScheduleDetails(){
+  const [rentalPeriod, setRentalPeriod] = useState<RentalPeriod>({} as RentalPeriod)
+
   const theme = useTheme();
   const navigation = useNavigation<Nav>();
+
+  const route = useRoute();
+  const { car, dates } = route.params as Params;
+
+  const rentalTotal = Number(dates.length * car.rent.price);
 
   function handleConfirmRental(){
     navigation.navigate('ScheduleCompleted')
   }
 
+  function handleBack() {
+    navigation.goBack()
+  }
+
+  useEffect(() => {
+    setRentalPeriod({
+      start: format(new Date(dates[0]), 'dd/MM/yyyy'),
+      end: format(new Date(dates[dates.length -1]), 'dd/MM/yyyy')
+    })
+  }, [])
+
   return (
     <Container>
       <Header>
-        <BackButton onPress={() => {}}/>
+        <BackButton onPress={handleBack}/>
       </Header>
       
       <CarImages>
         <ImgSlider 
-          imagesUrl={['https://esquilo.io/png/thumb/tOZhZK8Na6Txjt1-Audi-RS5-Red-PNG.png']}
+          imagesUrl={car.photos}
         />
       </CarImages>
 
       <Content>
         <Details>
           <Description>
-            <Brand>Audi</Brand>
-            <Name>R5</Name>
+            <Brand>{car.brand}</Brand>
+            <Name>{car.name}</Name>
           </Description>
           <Rent>
-            <Period>a day</Period>
-            <Price>£80</Price>
+            <Period>{car.rent.period}</Period>
+            <Price>{car.rent.price}</Price>
           </Rent>
         </Details>
 
         <Accessories>
-          <Accessory name='380km/h' icon={speedSvg}/>
-          <Accessory name='3.2s' icon={accelerationSvg}/>
-          <Accessory name='800 HP' icon={forceSvg}/>
-          <Accessory name='Gasoline' icon={gasolineSvg}/>
-          <Accessory name='Auto' icon={exchangeSvg}/>
-          <Accessory name='4 people' icon={peopleSvg}/>
+          { car.accessories.map(accessory => 
+             <Accessory 
+              key={accessory.type}
+              name={accessory.name} 
+              icon={getAccessoryIcon(accessory.type)}/>
+          )}
         </Accessories>
 
         <RentalPeriod>
@@ -98,7 +124,7 @@ export function ScheduleDetails(){
 
           <DateInfo>
             <DateTitle>FROM</DateTitle>
-            <DateValue>23/03/2022</DateValue>
+            <DateValue>{rentalPeriod.start}</DateValue>
           </DateInfo>
 
           <Feather 
@@ -109,15 +135,15 @@ export function ScheduleDetails(){
 
           <DateInfo>
             <DateTitle>TO</DateTitle>
-            <DateValue>24/03/2022</DateValue>
+            <DateValue>{rentalPeriod.end}</DateValue>
           </DateInfo>
         </RentalPeriod>
 
         <RentalPrice>
           <RentalPriceLabel>Total</RentalPriceLabel>
           <RentalPriceDetails>
-            <RentalPriceQuota>£80.00 x 3 days</RentalPriceQuota>
-            <RentalPriceTotal>£240.00</RentalPriceTotal>
+            <RentalPriceQuota>{`£${car.rent.price} x ${dates.length} days`}</RentalPriceQuota>
+            <RentalPriceTotal>£${rentalTotal}</RentalPriceTotal>
           </RentalPriceDetails>
         </RentalPrice>
 

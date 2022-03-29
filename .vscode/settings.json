@@ -1,6 +1,7 @@
 {
     "cSpell.words": [
-        "Borderless"
+        "Borderless",
+        "dtos"
     ],
     "emmet.triggerExpansionOnTab": true,
     "editor.useTabStops": false,
