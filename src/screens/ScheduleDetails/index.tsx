@@ -8,6 +8,8 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { CarDTO } from '../../dtos/CarDTO';
 import { format } from 'date-fns';
 
+import api from '../../services/api';
+
 import { Feather } from '@expo/vector-icons'
 import { RFValue } from 'react-native-responsive-fontsize';
 
@@ -38,6 +40,7 @@ import {
   RentalPriceQuota,
   RentalPriceTotal
 } from './styles';
+import { Alert } from 'react-native';
 
 type Nav = {
   navigate: (value: string) => void;
@@ -55,6 +58,7 @@ interface RentalPeriod {
 }
 
 export function ScheduleDetails(){
+  const [loading, setLoading] = useState(false);
   const [rentalPeriod, setRentalPeriod] = useState<RentalPeriod>({} as RentalPeriod)
 
   const theme = useTheme();
@@ -65,8 +69,34 @@ export function ScheduleDetails(){
 
   const rentalTotal = Number(dates.length * car.rent.price);
 
-  function handleConfirmRental(){
-    navigation.navigate('ScheduleCompleted')
+  async function handleConfirmRental(){
+      setLoading(true);
+
+      const schedulesByCar = await api.get(`/schedules_bycars/${car.id}`);
+
+      const unavailable_dates = [
+        ...schedulesByCar.data.unavailable_dates,
+        ...dates,
+      ]
+
+      api.put(`/schedules_bycars/${car.id}`, {
+        id:car.id,
+        unavailable_dates
+      })
+      .then(() => navigation.navigate('ScheduleCompleted'))
+      .catch(() => {
+        setLoading(false);
+        Alert.alert('Unable to complete reservation, please contact the branch.')
+        
+      })
+
+      await api.post('schedules_byuser', {
+        user_id: 1,
+        car,
+        startDate: format(new Date(dates[0]), 'dd/MM/yyyy'),
+        endDate: format(new Date(dates[dates.length -1]), 'dd/MM/yyyy')
+      })
+    
   }
 
   function handleBack() {
@@ -143,14 +173,20 @@ export function ScheduleDetails(){
           <RentalPriceLabel>Total</RentalPriceLabel>
           <RentalPriceDetails>
             <RentalPriceQuota>{`£${car.rent.price} x ${dates.length} days`}</RentalPriceQuota>
-            <RentalPriceTotal>£${rentalTotal}</RentalPriceTotal>
+            <RentalPriceTotal>£{rentalTotal}</RentalPriceTotal>
           </RentalPriceDetails>
         </RentalPrice>
 
       </Content>
 
       <Footer>
-        <Button title="Confirm reservation" color={theme.colors.success} onPress={handleConfirmRental}/>
+        <Button 
+          title="Confirm reservation" 
+          color={theme.colors.success} 
+          onPress={handleConfirmRental}
+          enabled={!loading}
+          loading={loading}
+        />
       </Footer>
     </Container>
   );

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTheme } from 'styled-components';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { Alert, StatusBar } from 'react-native';
+import { StatusBar } from 'react-native';
 import { format } from 'date-fns';
 import { CarDTO } from '../../dtos/CarDTO';
 
@@ -52,14 +52,10 @@ export function Schedule(){
   const { car } = route.params as Params;
 
   function handleConfirmRental(){
-    if(!rentalPeriod.startFormatted || !rentalPeriod.endFormatted) {
-      Alert.alert("Select the start and end dates of the vehicle rental")
-    } else{
     navigation.navigate('ScheduleDetails', {
       car,
       dates: Object.keys(markedDates)
     })
-    }
   }
 
   function handleBack() {
@@ -132,7 +128,11 @@ export function Schedule(){
       </Content>
 
       <Footer>
-        <Button title='Confirm' onPress={handleConfirmRental}/>
+        <Button 
+          title='Confirm' 
+          onPress={handleConfirmRental}
+          enabled={!!rentalPeriod.startFormatted}
+        />
       </Footer>
     </Container>
   );

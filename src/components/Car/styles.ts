@@ -1,3 +1,4 @@
+import { Platform } from 'react-native'; 
 import styled from 'styled-components/native';
 import { RFValue } from 'react-native-responsive-fontsize';
 import { RectButton } from 'react-native-gesture-handler';
@@ -10,6 +11,7 @@ export const Container = styled(RectButton)`
 
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
 
     padding: 24px;
     margin-bottom: 16px;
@@ -36,6 +38,7 @@ export const Container = styled(RectButton)`
   export const About = styled.View`
     flex-direction: row;
     align-items: center;
+    justify-content: center;
 
     margin-top: 16px;
   `
@@ -60,7 +63,8 @@ export const Container = styled(RectButton)`
     text-transform: uppercase;
   `
 
-  export const FuelType = styled.View``
+  export const FuelType = styled.View`
+  `
 
   export const CarImg = styled.Image`
     width: 167px;
