@@ -43,7 +43,7 @@ import {
 import { Alert } from 'react-native';
 
 type Nav = {
-  navigate: (value: string) => void;
+  navigate: (value: string, {}) => void;
   goBack: () => void;
 }
 
@@ -57,6 +57,7 @@ interface RentalPeriod {
   end: string;
 }
 
+
 export function ScheduleDetails(){
   const [loading, setLoading] = useState(false);
   const [rentalPeriod, setRentalPeriod] = useState<RentalPeriod>({} as RentalPeriod)
@@ -67,7 +68,7 @@ export function ScheduleDetails(){
   const route = useRoute();
   const { car, dates } = route.params as Params;
 
-  const rentalTotal = Number(dates.length * car.rent.price);
+  const rentalTotal = Number(dates.length * car.price);
 
   async function handleConfirmRental(){
       setLoading(true);
@@ -83,7 +84,11 @@ export function ScheduleDetails(){
         id:car.id,
         unavailable_dates
       })
-      .then(() => navigation.navigate('ScheduleCompleted'))
+      .then(() => navigation.navigate('Confirmation', {
+        nextScreenRoute: 'Home',
+        title: 'Vehicle reservation completed',
+        message: `Now you just have to go to\n the chosen store to sign the rental\n agreement and pick up the vehicle.`
+      }))
       .catch(() => {
         setLoading(false);
         Alert.alert('Unable to complete reservation, please contact the branch.')
@@ -129,8 +134,8 @@ export function ScheduleDetails(){
             <Name>{car.name}</Name>
           </Description>
           <Rent>
-            <Period>{car.rent.period}</Period>
-            <Price>{car.rent.price}</Price>
+            <Period>{car.period}</Period>
+            <Price>{car.price}</Price>
           </Rent>
         </Details>
 
@@ -172,7 +177,7 @@ export function ScheduleDetails(){
         <RentalPrice>
           <RentalPriceLabel>Total</RentalPriceLabel>
           <RentalPriceDetails>
-            <RentalPriceQuota>{`£${car.rent.price} x ${dates.length} days`}</RentalPriceQuota>
+            <RentalPriceQuota>{`£${car.price} x ${dates.length} days`}</RentalPriceQuota>
             <RentalPriceTotal>£{rentalTotal}</RentalPriceTotal>
           </RentalPriceDetails>
         </RentalPrice>

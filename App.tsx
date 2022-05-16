@@ -2,6 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import AppLoading from 'expo-app-loading';
 import { ThemeProvider } from 'styled-components'
+import { AppProvider } from './src/hooks'
 
 import {
   useFonts,
@@ -34,11 +35,11 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <NavigationContainer>
-        <ThemeProvider theme={theme}> 
-          <Routes />
+        <ThemeProvider theme={theme}>
+          <AppProvider> 
+            <Routes />
+          </AppProvider>
         </ThemeProvider>
-      </NavigationContainer>
     </GestureHandlerRootView>
   );
 }

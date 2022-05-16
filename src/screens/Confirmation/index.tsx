@@ -4,7 +4,7 @@ import { useWindowDimensions, StatusBar } from 'react-native'
 import LogoSvg from '../../assets/logo_background_gray.svg'
 import DoneSvg from '../../assets/done.svg'
 import { ConfirmButton } from '../../components/ConfirmButton';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 import {
   Container,
@@ -18,12 +18,21 @@ type Nav = {
   navigate: (value: string) => void;
 }
 
-export function ScheduleCompleted(){
+interface Params {
+  title: string;
+  message: string;
+  nextScreenRoute: string;
+}
+
+export function Confirmation(){
   const { width } = useWindowDimensions();
   const navigation = useNavigation<Nav>();
+  const route = useRoute();
+
+  const { title, message, nextScreenRoute } = route.params as Params;
 
   function handleReturnHome(){
-    navigation.navigate('Home')
+    navigation.navigate(nextScreenRoute)
   }
 
   return (
@@ -37,9 +46,9 @@ export function ScheduleCompleted(){
 
       <Content>
         <DoneSvg width={80} height={80} />
-        <Title>Vehicle reservation {'\n'}completed!</Title>
+        <Title>{title}</Title>
 
-        <Message>Now you just have to go to {'\n'}the chosen store to sign the rental{'\n'} agreement and pick up the vehicle.</Message>
+        <Message>{message}</Message>
       </Content>
 
       <Footer>
